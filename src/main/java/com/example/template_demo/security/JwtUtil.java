@@ -12,7 +12,7 @@ public class JwtUtil {
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
     private final long expirationMs = 1000 * 60 * 60; // 1 Hour
 
-    public String generateToke(String username) {
+    public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
