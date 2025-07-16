@@ -25,7 +25,7 @@ public class JwtAuthenticationFilter extends GenericFilter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String authHeader = httpRequest.getHeader("Authorization");
 
-        if (authHeader != null && !authHeader.startsWith("Bearer ")) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             String username = jwtUtil.validateAndExtract(token);
             if (username != null) {

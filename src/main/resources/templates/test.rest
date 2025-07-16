@@ -1,7 +1,32 @@
+@accessToken = eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjY0NDIxOCwiZXhwIjoxNzUyNjQ3ODE4fQ.TgY-LnQDNiViz0e4SX0aOOcUhwqo89GOlGFJh7HyTZzlqkbjbKQ-dJg2Ts2qQWTFsHjk-i6iOqyvhS5vothPqA
+
+### 1. 회원가입 (이미 존재하면 생략)
 POST http://localhost:8080/api/register
 Content-Type: application/json
 
 {
-    "username": "testuser",
-    "password": "1234"
+  "username": "testuser",
+  "password": "1234"
 }
+
+###
+
+### 2. 로그인 (access + refreshToken 발급)
+POST http://localhost:8080/api/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "1234"
+}
+
+###
+
+### 3. 보호된 API (accessToken 필요)
+GET http://localhost:8080/api/userinfo
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjY0NDQwMCwiZXhwIjoxNzUyNjQ4MDAwfQ.cIO4FbSEFg6mHu95YvxJylVjyp0gL63K0v81Xd-9nFeJRSi4hCRsgSAaPDIM6t54drHU06CIJ-9OmPmmZFyM5Q
+
+###
+
+### 4. 토큰 재발급 요청
+POST http://localhost:8080/api/refresh
