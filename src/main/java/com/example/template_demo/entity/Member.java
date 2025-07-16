@@ -14,6 +14,6 @@ public class Member {
     //Field
     private Integer Idx;
 
-    private String id;
-    private String pw;
+    private String username;
+    private String password;
 }
