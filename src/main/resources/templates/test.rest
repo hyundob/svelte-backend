@@ -24,9 +24,10 @@ Content-Type: application/json
 
 ### 3. 보호된 API (accessToken 필요)
 GET http://localhost:8080/api/userinfo
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjY0NDQwMCwiZXhwIjoxNzUyNjQ4MDAwfQ.cIO4FbSEFg6mHu95YvxJylVjyp0gL63K0v81Xd-9nFeJRSi4hCRsgSAaPDIM6t54drHU06CIJ-9OmPmmZFyM5Q
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjY0NzYyOSwiZXhwIjoxNzUyNjUxMjI5fQ.yvZujnrmFcUvM_cl87xwHFFQwmj63Tw7NcGjoV77bqX3EcB3Nn2RnlTIjvnXbcWRK940BvSs30Qje9kiZR_rxw
 
 ###
 
 ### 4. 토큰 재발급 요청
 POST http://localhost:8080/api/refresh
+Cookie: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlhdCI6MTc1MjY0NzU4MCwiZXhwIjoxNzUyNjUxMTgwfQ.75Jv_68zJybCUXa4Bcs-gD_A6rF4EuDRLgGQjCSG-FuPR9Gg3elejZ0DEIayex4zqRuRcmIE4TAQGKsWh_fPbQ

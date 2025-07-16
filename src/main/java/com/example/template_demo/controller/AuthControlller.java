@@ -6,11 +6,14 @@ import com.example.template_demo.repository.MemberRepository;
 import com.example.template_demo.security.JwtUtil;
 import com.example.template_demo.service.RefreshTokenService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.time.Duration;
 import java.util.Map;
 
 @RestController
@@ -20,6 +23,8 @@ public class AuthControlller {
     private final MemberRepository memberRepository;
     private final JwtUtil jwtUtil;
     private final RefreshTokenService service;
+    @Value("${jwt.refreshExpirationMs}")
+    private Long refreshExpiryMs;
 
     public AuthControlller(MemberRepository memberRepository, JwtUtil jwtUtil, RefreshTokenService service) {
         this.memberRepository = memberRepository;
@@ -28,15 +33,28 @@ public class AuthControlller {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request, HttpServletResponse response) {
         return memberRepository.findByUsername(request.getUsername())
                 .filter(user -> user.getPassword().equals(request.getPassword()))
                 .map(user -> {
-                    String token = jwtUtil.generateToken(user.getUsername());
-                    return ResponseEntity.ok(Map.of("token", token));
+                    String accessToken = jwtUtil.generateToken(user.getUsername());
+                    String refreshToken = service.createRefreshToken(user.getUsername()); // 저장 + 생성
+
+                    // Refresh Token을 HttpOnly 쿠키로 설정
+                    ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                            .httpOnly(true)
+                            .path("/") // 프론트 요청 경로 전역에 쿠키 사용
+                            .maxAge(Duration.ofMillis(refreshExpiryMs)) // application.properties 값
+                            .secure(false) // 배포 시 true (https)
+                            .build();
+
+                    return ResponseEntity.ok()
+                            .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                            .body(Map.of("token", accessToken));
                 })
                 .orElse(ResponseEntity.status(401).body(Map.of("error", "Unauthorized")));
     }
+
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
@@ -55,15 +73,24 @@ public class AuthControlller {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh(@CookieValue("refreshToken") String rtCookie) {
-        if(!service.validateRefreshToken(rtCookie)) {
+    public ResponseEntity<?> refresh(@CookieValue(value = "refreshToken", required = false) String rtCookie) {
+        System.out.println("받은 refreshToken: " + rtCookie);
+
+        if (rtCookie == null) {
+            return ResponseEntity.badRequest().body("refreshToken is missing!");
+        }
+
+        if (!service.validateRefreshToken(rtCookie)) {
+            System.out.println("Refresh Token 유효하지 않음!");
             return ResponseEntity.status(401).body("Invalid or expired refresh token.");
         }
-        String username = jwtUtil.validateRefreshToken(rtCookie);
+
+        String username = jwtUtil.validateRefreshToken(rtCookie); // 여기서도 로그 가능
         String access = jwtUtil.generateToken(username);
 
         return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, "Bearer " + access).build();
     }
+
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@CookieValue("refreshToken") String rtCookie, HttpServletResponse res) {

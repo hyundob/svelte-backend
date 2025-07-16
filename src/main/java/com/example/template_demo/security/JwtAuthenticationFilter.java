@@ -28,12 +28,14 @@ public class JwtAuthenticationFilter extends GenericFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             String username = jwtUtil.validateAndExtract(token);
+
+            //System.out.println("Authorization Header: " + authHeader);
+            //System.out.println("Extracted Username: " + username);
             if (username != null) {
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList());
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
-
         chain.doFilter(request, response);
     }
 }
