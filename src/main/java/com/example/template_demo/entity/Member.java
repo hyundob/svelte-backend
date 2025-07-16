@@ -8,11 +8,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member {
-    //Getter and Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     //Field
-    private Integer Idx;
+    private Integer id;
 
     private String username;
     private String password;
